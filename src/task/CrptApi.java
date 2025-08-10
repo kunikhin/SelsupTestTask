@@ -5,10 +5,27 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+/**
+ * Необходимо реализовать на языке Java (можно использовать 11 версию) класс для работы с API Честного знака.
+ * Класс должен быть thread-safe и поддерживать ограничение на количество запросов к API.
+ * Ограничение указывается в конструкторе в виде количества запросов в определенный интервал времени. Например:
+ * public CrptApi(TimeUnit timeUnit, int requestLimit)
+ * timeUnit – указывает промежуток времени – секунда, минута и пр.
+ * requestLimit – положительное значение, которое определяет максимальное количество запросов в этом промежутке времени.
+ * При превышении лимита запрос должен блокироваться, чтобы не превысить максимальное количество запросов к API и продолжить выполнение, когда ограничение не превышено.
+ * Реализовать нужно единственный метод – Создание документа для ввода в оборот товара, произведенного в РФ.
+ * Документ и подпись должны передаваться в метод в виде Java объекта и строки соответственно.
+ * При реализации можно использовать библиотеки HTTP клиента, JSON сериализации.
+ * Реализация должна быть максимально удобной для последующего расширения функционала.
+ * Решение должно быть оформлено в виде одного файла CrptApi.java. Все дополнительные классы, которые используются должны быть внутренними.
+ */
 
 public class CrptApi {
 
@@ -26,7 +43,6 @@ public class CrptApi {
         if (requestLimit <= 0) {
             throw new ApiException("Request limit must be positive");
         }
-
         this.capacity = requestLimit;
         this.tokens = requestLimit;
         this.refillPeriodNanos = timeUnit.toNanos(1);
@@ -76,21 +92,34 @@ public class CrptApi {
     }
 
     private void sendHttpRequest(String jsonBody, String signature) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(API_URL))
-                .header("Content-Type", "application/json")
-                .header("Signature", signature)
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                .build();
+        final int maxAttempts = 3;
+        List<Exception> exceptionList = new ArrayList<>();
 
-        HttpResponse<String> response = httpClient.send(
-                request,
-                HttpResponse.BodyHandlers.ofString()
-        );
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(API_URL))
+                        .header("Content-Type", "application/json")
+                        .header("Signature", signature)
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                        .build();
 
-        if (response.statusCode() != 200) {
-            throw new ApiException("API error: " + response.body());
+                HttpResponse<String> response = httpClient.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
+
+                if (response.statusCode() == 200) return;
+                else exceptionList.add(new ApiException("HTTP error " + response.statusCode() + ": " + response.body()));
+
+            } catch (Exception e) {
+                exceptionList.add(e);
+            }
+
+            if (attempt < maxAttempts) Thread.sleep(1000);
         }
+
+        throw new ApiException("Failed after " + maxAttempts + " attempts. Errors: " + exceptionList);
     }
 
     public static class Document implements JsonSerializable {
