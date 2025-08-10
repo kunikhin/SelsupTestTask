@@ -24,7 +24,7 @@ public class CrptApi {
 
     public CrptApi(TimeUnit timeUnit, int requestLimit) {
         if (requestLimit <= 0) {
-            throw new IllegalArgumentException("Request limit must be positive");
+            throw new ApiException("Request limit must be positive");
         }
 
         this.capacity = requestLimit;
@@ -32,7 +32,7 @@ public class CrptApi {
         this.refillPeriodNanos = timeUnit.toNanos(1);
         this.lastRefillNanos = System.nanoTime();
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
+                .connectTimeout(Duration.ofSeconds(30))
                 .build();
     }
 
