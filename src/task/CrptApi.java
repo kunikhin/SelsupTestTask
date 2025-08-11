@@ -133,7 +133,7 @@ public class CrptApi {
         private String producer_inn;
         private String production_date;
         private String production_type;
-        private Product[] products;
+        private List<Product> products;
         private String reg_date;
         private String reg_number;
 
@@ -219,14 +219,19 @@ public class CrptApi {
             return this;
         }
 
-        public JsonBuilder addField(String name, JsonSerializable[] values) {
-            if (values == null) return this;
+        public JsonBuilder addField(String name, List<? extends JsonSerializable> values) {
+            if (values == null || values.isEmpty()) return this;
+
             addCommaIfNeeded();
             sb.append("\"").append(name).append("\":[");
-            for (int i = 0; i < values.length; i++) {
-                if (i > 0) sb.append(",");
-                sb.append(values[i].toJson());
+
+            boolean first = true;
+            for (JsonSerializable value : values) {
+                if (!first) sb.append(",");
+                sb.append(value.toJson());
+                first = false;
             }
+
             sb.append("]");
             return this;
         }
