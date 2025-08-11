@@ -6,7 +6,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -137,6 +139,58 @@ public class CrptApi {
         private String reg_date;
         private String reg_number;
 
+        public Description getDescription() {
+            return description;
+        }
+
+        public String getDoc_id() {
+            return doc_id;
+        }
+
+        public String getDoc_status() {
+            return doc_status;
+        }
+
+        public String getDoc_type() {
+            return doc_type;
+        }
+
+        public String getImportRequest() {
+            return importRequest;
+        }
+
+        public String getOwner_inn() {
+            return owner_inn;
+        }
+
+        public String getParticipant_inn() {
+            return participant_inn;
+        }
+
+        public String getProducer_inn() {
+            return producer_inn;
+        }
+
+        public String getProduction_date() {
+            return production_date;
+        }
+
+        public String getProduction_type() {
+            return production_type;
+        }
+
+        public List<Product> getProducts() {
+            return Collections.unmodifiableList(products);
+        }
+
+        public String getReg_date() {
+            return reg_date;
+        }
+
+        public String getReg_number() {
+            return reg_number;
+        }
+
         @Override
         public String toJson() {
             JsonBuilder builder = new JsonBuilder()
@@ -160,6 +214,10 @@ public class CrptApi {
     public static class Description implements JsonSerializable {
         private String participantInn;
 
+        public String getParticipantInn() {
+            return participantInn;
+        }
+
         @Override
         public String toJson() {
             return new JsonBuilder()
@@ -178,6 +236,97 @@ public class CrptApi {
         private String tnved_code;
         private String uit_code;
         private String uitu_code;
+
+        public void setCertificate_document(String certificate_document) {
+            this.certificate_document = certificate_document;
+        }
+
+        public void setCertificate_document_date(String certificate_document_date) {
+            this.certificate_document_date = certificate_document_date;
+        }
+
+        public void setCertificate_document_number(String certificate_document_number) {
+            this.certificate_document_number = certificate_document_number;
+        }
+
+        public void setOwner_inn(String owner_inn) {
+            this.owner_inn = owner_inn;
+        }
+
+        public void setProducer_inn(String producer_inn) {
+            this.producer_inn = producer_inn;
+        }
+
+        public void setProduction_date(String production_date) {
+            this.production_date = production_date;
+        }
+
+        public void setTnved_code(String tnved_code) {
+            this.tnved_code = tnved_code;
+        }
+
+        public void setUit_code(String uit_code) {
+            this.uit_code = uit_code;
+        }
+
+        public void setUitu_code(String uitu_code) {
+            this.uitu_code = uitu_code;
+        }
+
+        public String getCertificate_document() {
+            return certificate_document;
+        }
+
+        public String getCertificate_document_date() {
+            return certificate_document_date;
+        }
+
+        public String getCertificate_document_number() {
+            return certificate_document_number;
+        }
+
+        public String getOwner_inn() {
+            return owner_inn;
+        }
+
+        public String getProducer_inn() {
+            return producer_inn;
+        }
+
+        public String getProduction_date() {
+            return production_date;
+        }
+
+        public String getTnved_code() {
+            return tnved_code;
+        }
+
+        public String getUit_code() {
+            return uit_code;
+        }
+
+        public String getUitu_code() {
+            return uitu_code;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Product product)) return false;
+            return Objects.equals(certificate_document, product.certificate_document) &&
+                    Objects.equals(certificate_document_date, product.certificate_document_date) &&
+                    Objects.equals(certificate_document_number, product.certificate_document_number) &&
+                    Objects.equals(owner_inn, product.owner_inn) &&
+                    Objects.equals(producer_inn, product.producer_inn) &&
+                    Objects.equals(production_date, product.production_date) &&
+                    Objects.equals(tnved_code, product.tnved_code) &&
+                    Objects.equals(uit_code, product.uit_code) &&
+                    Objects.equals(uitu_code, product.uitu_code);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(certificate_document, certificate_document_date, certificate_document_number, owner_inn, producer_inn, production_date, tnved_code, uit_code, uitu_code);
+        }
 
         @Override
         public String toJson() {
